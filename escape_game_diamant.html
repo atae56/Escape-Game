@@ -85,6 +85,32 @@
         // Lettres dans l'ordre (mot secret)
         const lettres = ["D", "I", "A", "M", "A", "N", "T"];
         let etape = 0;
+        let lettresRestantes = [...lettres]; // Copie des lettres à débloquer
+
+        function checkAnswer() {
+            const userInput = document.getElementById("answer").value.trim().toLowerCase();
+            const reponseDecodee = atob(enigmes[etape].reponseCodee).toLowerCase();
+        
+            if (userInput === reponseDecodee) {
+                document.getElementById("feedback").innerText = "✅ Bonne réponse ! Lettre débloquée.";
+        
+                // Choisir une lettre aléatoire dans les lettres restantes
+                const randomIndex = Math.floor(Math.random() * lettresRestantes.length);
+                const letter = lettresRestantes.splice(randomIndex, 1)[0]; // Retire la lettre et la récupère
+        
+                // Affiche la lettre
+                const letterBox = document.createElement("div");
+                letterBox.className = "letter-box";
+                letterBox.innerText = letter;
+                document.getElementById("unlockedLetters").appendChild(letterBox);
+        
+                etape++;
+                setTimeout(afficherEtape, 1000);
+            } else {
+                document.getElementById("feedback").innerText = "❌ Mauvaise réponse, réessaie.";
+            }
+        }
+
 
         // Mélange aléatoire des lettres pour le déblocage
         let lettresMelangees = [...lettres].sort(() => 0.5 - Math.random());
