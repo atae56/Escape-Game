@@ -113,26 +113,35 @@
     }
 
     function checkAnswer() {
-      const userInput = document.getElementById("answer").value.trim();
-      const reponseDecodee = atob(enigmes[etape].reponseCodee);
-
-      if (userInput === reponseDecodee) {
-        document.getElementById("feedback").innerText = "✅ Bonne réponse ! Lettre débloquée.";
-
-        const randomIndex = Math.floor(Math.random() * lettresRestantes.length);
-        const letter = lettresRestantes.splice(randomIndex, 1)[0];
-
-        const letterBox = document.createElement("div");
-        letterBox.className = "letter-box";
-        letterBox.innerText = letter;
-        document.getElementById("unlockedLetters").appendChild(letterBox);
-
-        etape++;
-        setTimeout(afficherEtape, 1000);
-      } else {
-        document.getElementById("feedback").innerText = "❌ Mauvaise réponse, réessaie.";
-      }
+    const userInput = document.getElementById("answer").value.trim().toLowerCase();
+  
+    let reponseDecodee;
+    try {
+      // Essaie un double décodage
+      reponseDecodee = atob(atob(enigmes[etape].reponseCodee)).toLowerCase();
+    } catch {
+      // Si ça plante, essaie juste un seul décodage
+      reponseDecodee = atob(enigmes[etape].reponseCodee).toLowerCase();
     }
+  
+    if (userInput === reponseDecodee) {
+      document.getElementById("feedback").innerText = "✅ Bonne réponse ! Lettre débloquée.";
+  
+      const randomIndex = Math.floor(Math.random() * lettresRestantes.length);
+      const letter = lettresRestantes.splice(randomIndex, 1)[0];
+  
+      const letterBox = document.createElement("div");
+      letterBox.className = "letter-box";
+      letterBox.innerText = letter;
+      document.getElementById("unlockedLetters").appendChild(letterBox);
+  
+      etape++;
+      setTimeout(afficherEtape, 1000);
+    } else {
+      document.getElementById("feedback").innerText = "❌ Mauvaise réponse, réessaie.";
+    }
+  }
+
 
     function checkFinalAnswer() {
       const mot = document.getElementById("finalAnswer").value.trim().toUpperCase();
