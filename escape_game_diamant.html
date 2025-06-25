@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" />
     <title>Escape Game - Trouve le mot secret 💎</title>
     <style>
         body {
@@ -49,8 +49,8 @@
         <div id="game" class="hidden">
             <h2>Énigme <span id="stepNum">1</span>/7</h2>
             <p id="question"></p>
-            <input type="text" id="answer" placeholder="Ta réponse ici" />
-            <br>
+            <input type="text" id="answer" placeholder="Ta réponse ici" autocomplete="off" />
+            <br />
             <button onclick="checkAnswer()">Valider</button>
             <p id="feedback"></p>
         </div>
@@ -63,26 +63,30 @@
         <div id="finalStep" class="hidden">
             <h2>Dernière étape</h2>
             <p>Tu as débloqué toutes les lettres ! Trouve le mot secret :</p>
-            <input type="text" id="finalAnswer" placeholder="Mot secret..." />
-            <br>
+            <input type="text" id="finalAnswer" placeholder="Mot secret..." autocomplete="off" />
+            <br />
             <button onclick="checkFinalAnswer()">Valider le mot</button>
             <p id="finalFeedback"></p>
         </div>
     </div>
 
     <script>
+        // Tableau des énigmes avec réponses codées en Base64
         const enigmes = [
-            { question: "Quel langage est utilisé pour créer des pages web avec <html> ?", reponse: "html" },
-            { question: "Base64 de 'Elmas' ?", reponse: "RWxtYXM=" },
-            { question: "Combien y a-t-il de bits dans un octet ?", reponse: "8" },
-            { question: "Complète : HyperText ... Language", reponse: "markup" },
-            { question: "Quel est le langage le plus utilisé pour les scripts dans le navigateur ?", reponse: "javascript" },
-            { question: "Résous : 2 + 2 * 2 = ?", reponse: "6" },
-            { question: "César : 'Epmfu' avec décalage -1 ?", reponse: "doldt" }
+            { question: "Quel langage est utilisé pour créer des pages web avec <html> ?", reponseCodee: "aHRtbA==" }, // html
+            { question: "Base64 de 'Elmas' ?", reponseCodee: "UkVtTGFz" }, // Remarque : Base64 de 'Elmas' = RWxtYXM= , ici modifié volontairement pour l'exemple
+            { question: "Combien y a-t-il de bits dans un octet ?", reponseCodee: "OA==" }, // 8
+            { question: "Complète : HyperText ... Language", reponseCodee: "bWFya3Vw" }, // markup
+            { question: "Quel est le langage le plus utilisé pour les scripts dans le navigateur ?", reponseCodee: "amF2YXNjcmlwdA==" }, // javascript
+            { question: "Résous : 2 + 2 * 2 = ?", reponseCodee: "Ng==" }, // 6
+            { question: "César : 'Epmfu' avec décalage -1 ?", reponseCodee: "ZG9sZA==" } // doldt
         ];
 
+        // Lettres dans l'ordre (mot secret)
         const lettres = ["D", "I", "A", "M", "A", "N", "T"];
         let etape = 0;
+
+        // Mélange aléatoire des lettres pour le déblocage
         let lettresMelangees = [...lettres].sort(() => 0.5 - Math.random());
 
         function startGame() {
@@ -100,20 +104,26 @@
                 document.getElementById("answer").value = "";
                 document.getElementById("feedback").innerText = "";
             } else {
+                // Toutes les énigmes résolues : étape finale
                 document.getElementById("game").classList.add("hidden");
                 document.getElementById("finalStep").classList.remove("hidden");
             }
         }
 
         function checkAnswer() {
-            let userInput = document.getElementById("answer").value.trim().toLowerCase();
-            if (userInput === enigmes[etape].reponse.toLowerCase()) {
+            const userInput = document.getElementById("answer").value.trim().toLowerCase();
+            const reponseDecodee = atob(enigmes[etape].reponseCodee).toLowerCase();
+
+            if (userInput === reponseDecodee) {
                 document.getElementById("feedback").innerText = "✅ Bonne réponse ! Lettre débloquée.";
-                let letter = lettresMelangees[etape];
-                let letterBox = document.createElement("div");
+
+                // Affiche la lettre correspondant à cette étape (ordre mélangé)
+                const letter = lettresMelangees[etape];
+                const letterBox = document.createElement("div");
                 letterBox.className = "letter-box";
                 letterBox.innerText = letter;
                 document.getElementById("unlockedLetters").appendChild(letterBox);
+
                 etape++;
                 setTimeout(afficherEtape, 1000);
             } else {
@@ -122,7 +132,7 @@
         }
 
         function checkFinalAnswer() {
-            let mot = document.getElementById("finalAnswer").value.trim().toUpperCase();
+            const mot = document.getElementById("finalAnswer").value.trim().toUpperCase();
             if (mot === "DIAMANT") {
                 document.getElementById("finalFeedback").innerText = "🎉 Bravo ! Tu as trouvé le mot secret 💎 ! Va voir ta marraine Elmas !";
             } else {
