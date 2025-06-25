@@ -1,148 +1,148 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8" />
-    <title>Escape Game - Trouve le mot secret 💎</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', sans-serif;
-            background-color: #1a1a1a;
-            color: white;
-            text-align: center;
-            padding: 30px;
-        }
-        .container {
-            max-width: 700px;
-            margin: auto;
-            padding: 20px;
-            background-color: #2b2b2b;
-            border-radius: 10px;
-            box-shadow: 0 0 10px #00ffff;
-        }
-        input, button {
-            padding: 10px;
-            font-size: 16px;
-            margin-top: 10px;
-            border-radius: 5px;
-            border: none;
-        }
-        .hidden {
-            display: none;
-        }
-        .letter-box {
-            display: inline-block;
-            margin: 5px;
-            padding: 10px 15px;
-            background: #00ffff;
-            color: black;
-            font-weight: bold;
-            border-radius: 5px;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <title>Escape Game - Trouve le mot secret 💎</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #1a1a1a;
+      color: white;
+      text-align: center;
+      padding: 30px;
+    }
+    .container {
+      max-width: 700px;
+      margin: auto;
+      padding: 20px;
+      background-color: #2b2b2b;
+      border-radius: 10px;
+      box-shadow: 0 0 10px #00ffff;
+    }
+    input, button {
+      padding: 10px;
+      font-size: 16px;
+      margin-top: 10px;
+      border-radius: 5px;
+      border: none;
+    }
+    .hidden {
+      display: none;
+    }
+    .letter-box {
+      display: inline-block;
+      margin: 5px;
+      padding: 10px 15px;
+      background: #00ffff;
+      color: black;
+      font-weight: bold;
+      border-radius: 5px;
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h1>🔐 Escape Game : Trouve le mot secret</h1>
-        <p id="instruction">Tu vas devoir résoudre 10 énigmes pour découvrir les lettres d’un mot secret lié à ta marraine 💎. Clique sur commencer pour démarrer !</p>
-        <button onclick="startGame()">Commencer</button>
+  <div class="container">
+    <h1>🔐 Escape Game : Trouve le mot secret</h1>
+    <p id="instruction">Tu vas devoir résoudre 10 énigmes pour découvrir les lettres d’un mot secret lié à ta marraine 💎. Clique sur commencer pour démarrer !</p>
+    <button onclick="startGame()">Commencer</button>
 
-        <div id="game" class="hidden">
-            <h2>Énigme <span id="stepNum">1</span>/10</h2>
-            <p id="question"></p>
-            <input type="text" id="answer" placeholder="Ta réponse ici" autocomplete="off" />
-            <br />
-            <button onclick="checkAnswer()">Valider</button>
-            <p id="feedback"></p>
-        </div>
-
-        <div id="letters" class="hidden">
-            <h3>Lettres débloquées :</h3>
-            <div id="unlockedLetters"></div>
-        </div>
-
-        <div id="finalStep" class="hidden">
-            <h2>Dernière étape</h2>
-            <p>Tu as débloqué toutes les lettres ! Trouve le mot secret :</p>
-            <input type="text" id="finalAnswer" placeholder="Mot secret..." autocomplete="off" />
-            <br />
-            <button onclick="checkFinalAnswer()">Valider le mot</button>
-            <p id="finalFeedback"></p>
-        </div>
+    <div id="game" class="hidden">
+      <h2>Énigme <span id="stepNum">1</span>/10</h2>
+      <p id="question"></p>
+      <input type="text" id="answer" placeholder="Ta réponse ici" autocomplete="off" />
+      <br />
+      <button onclick="checkAnswer()">Valider</button>
+      <p id="feedback"></p>
     </div>
 
-    <script>
-        // Tableau des énigmes avec réponses codées en Base64
-        const enigmes = [
-            { question: "Quel langage est utilisé pour créer des pages web avec <html> ?", reponseCodee: "aHRtbA==" }, // html
-            { question: "Base64 de 'Elmas' ?", reponseCodee: "RWxtYXM=" }, // Elmas encodé
-            { question: "Combien y a-t-il de bits dans un octet ?", reponseCodee: "OA==" }, // 8
-            { question: "Complète : HyperText ... Language", reponseCodee: "bWFya3Vw" }, // markup
-            { question: "Quel est le langage le plus utilisé pour les scripts dans le navigateur ?", reponseCodee: "amF2YXNjcmlwdA==" }, // javascript
-            { question: "Résous : 2 + 2 * 2 = ?", reponseCodee: "Ng==" }, // 6
-            { question: "César : 'Epmfu' avec décalage -1 ?", reponseCodee: "ZG9sZA==" }, // dold
-            { question: "Quelle couleur obtient-on en mélangeant du rouge et du bleu ?", reponseCodee: "dmVpbGV0" }, // violet
-            { question: "Combien de côtés a un hexagone ?", reponseCodee: "Ng==" }, // 6
-            { question: "Que signifie l’acronyme HTML ?", reponseCodee: "aHlwZXJ0ZXh0IG1hcmt1cCBsYW5ndWFnZQ==" } // hypertext markup language
-        ];
-    
-        const lettres = ["D", "I", "A", "M", "A", "N", "T", "V", "I", "O", "L", "E", "T"];
-        const lettresAUtiliser = lettres.slice(0, enigmes.length);
-    
-        let etape = 0;
-        let lettresRestantes = [...lettresAUtiliser];
-    
-        function startGame() {
-            document.getElementById("game").classList.remove("hidden");
-            document.getElementById("letters").classList.remove("hidden");
-            document.querySelector("button").style.display = "none";
-            document.getElementById("instruction").style.display = "none";
-            afficherEtape();
-        }
-    
-        function afficherEtape() {
-            if (etape < enigmes.length) {
-                document.getElementById("stepNum").innerText = etape + 1;
-                document.getElementById("question").innerText = enigmes[etape].question;
-                document.getElementById("answer").value = "";
-                document.getElementById("feedback").innerText = "";
-            } else {
-                document.getElementById("game").classList.add("hidden");
-                document.getElementById("finalStep").classList.remove("hidden");
-            }
-        }
-    
-        function checkAnswer() {
-            const userInput = document.getElementById("answer").value.trim();
-            const reponseCodee = enigmes[etape].reponseCodee;
+    <div id="letters" class="hidden">
+      <h3>Lettres débloquées :</h3>
+      <div id="unlockedLetters"></div>
+    </div>
 
-    
-            if (userInput === reponseCodee) {
-                document.getElementById("feedback").innerText = "✅ Bonne réponse ! Lettre débloquée.";
-    
-                const randomIndex = Math.floor(Math.random() * lettresRestantes.length);
-                const letter = lettresRestantes.splice(randomIndex, 1)[0];
-    
-                const letterBox = document.createElement("div");
-                letterBox.className = "letter-box";
-                letterBox.innerText = letter;
-                document.getElementById("unlockedLetters").appendChild(letterBox);
-    
-                etape++;
-                setTimeout(afficherEtape, 1000);
-            } else {
-                document.getElementById("feedback").innerText = "❌ Mauvaise réponse, réessaie.";
-            }
-        }
-    
-        function checkFinalAnswer() {
-            const mot = document.getElementById("finalAnswer").value.trim().toUpperCase();
-            const motSecret = lettresAUtiliser.join("");
-            if (mot === motSecret) {
-                document.getElementById("finalFeedback").innerText = "🎉 Bravo ! Tu as trouvé le mot secret 💎 ! Va voir ta marraine Elmas !";
-            } else {
-                document.getElementById("finalFeedback").innerText = "😅 Ce n’est pas le bon mot, réfléchis encore...";
-            }
-        }
-    </script>
+    <div id="finalStep" class="hidden">
+      <h2>Dernière étape</h2>
+      <p>Tu as débloqué toutes les lettres ! Trouve le mot secret :</p>
+      <input type="text" id="finalAnswer" placeholder="Mot secret..." autocomplete="off" />
+      <br />
+      <button onclick="checkFinalAnswer()">Valider le mot</button>
+      <p id="finalFeedback"></p>
+    </div>
+  </div>
+
+  <script>
+    // Liste des énigmes
+    const enigmes = [
+      { question: "Quel langage est utilisé pour créer des pages web avec <html> ?", reponseCodee: "aHRtbA==" }, // html
+      { question: "Base64 de 'Elmas' ?", reponseCodee: "UldsdFlYTT0=" }, // RWxtYXM= encodé une 2ème fois
+      { question: "Combien y a-t-il de bits dans un octet ?", reponseCodee: "OA==" }, // 8
+      { question: "Complète : HyperText ... Language", reponseCodee: "bWFya3Vw" }, // markup
+      { question: "Quel est le langage le plus utilisé pour les scripts dans le navigateur ?", reponseCodee: "amF2YXNjcmlwdA==" }, // javascript
+      { question: "Résous : 2 + 2 * 2 = ?", reponseCodee: "Ng==" }, // 6
+      { question: "César : 'Epmfu' avec décalage -1 ?", reponseCodee: "ZG9sZA==" }, // dold
+      { question: "Quelle couleur obtient-on en mélangeant du rouge et du bleu ?", reponseCodee: "dmVpbGV0" }, // violet
+      { question: "Combien de côtés a un hexagone ?", reponseCodee: "Ng==" }, // 6
+      { question: "Que signifie l’acronyme HTML ?", reponseCodee: "aHlwZXJ0ZXh0IG1hcmt1cCBsYW5ndWFnZQ==" } // hypertext markup language
+    ];
+
+    // Mot secret : DIAMANTVIOLET (13 lettres, on en garde 10 pour 10 énigmes)
+    const lettres = ["D", "I", "A", "M", "A", "N", "T", "V", "I", "O", "L", "E", "T"];
+    const lettresAUtiliser = lettres.slice(0, enigmes.length); // Prend les 10 premières lettres
+
+    let etape = 0;
+    let lettresRestantes = [...lettresAUtiliser];
+
+    function startGame() {
+      document.getElementById("game").classList.remove("hidden");
+      document.getElementById("letters").classList.remove("hidden");
+      document.querySelector("button").style.display = "none";
+      document.getElementById("instruction").style.display = "none";
+      afficherEtape();
+    }
+
+    function afficherEtape() {
+      if (etape < enigmes.length) {
+        document.getElementById("stepNum").innerText = etape + 1;
+        document.getElementById("question").innerText = enigmes[etape].question;
+        document.getElementById("answer").value = "";
+        document.getElementById("feedback").innerText = "";
+      } else {
+        document.getElementById("game").classList.add("hidden");
+        document.getElementById("finalStep").classList.remove("hidden");
+      }
+    }
+
+    function checkAnswer() {
+      const userInput = document.getElementById("answer").value.trim();
+      const reponseDecodee = atob(enigmes[etape].reponseCodee);
+
+      if (userInput === reponseDecodee) {
+        document.getElementById("feedback").innerText = "✅ Bonne réponse ! Lettre débloquée.";
+
+        const randomIndex = Math.floor(Math.random() * lettresRestantes.length);
+        const letter = lettresRestantes.splice(randomIndex, 1)[0];
+
+        const letterBox = document.createElement("div");
+        letterBox.className = "letter-box";
+        letterBox.innerText = letter;
+        document.getElementById("unlockedLetters").appendChild(letterBox);
+
+        etape++;
+        setTimeout(afficherEtape, 1000);
+      } else {
+        document.getElementById("feedback").innerText = "❌ Mauvaise réponse, réessaie.";
+      }
+    }
+
+    function checkFinalAnswer() {
+      const mot = document.getElementById("finalAnswer").value.trim().toUpperCase();
+      const motSecret = lettresAUtiliser.join("");
+      if (mot === motSecret) {
+        document.getElementById("finalFeedback").innerText = "🎉 Bravo ! Tu as trouvé le mot secret 💎 ! Va voir ta marraine Elmas !";
+      } else {
+        document.getElementById("finalFeedback").innerText = "😅 Ce n’est pas le bon mot, réfléchis encore...";
+      }
+    }
+  </script>
 </body>
 </html>
