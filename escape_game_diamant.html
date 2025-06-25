@@ -43,11 +43,11 @@
 <body>
     <div class="container">
         <h1>🔐 Escape Game : Trouve le mot secret</h1>
-        <p id="instruction">Tu vas devoir résoudre 7 énigmes pour découvrir les lettres d’un mot secret lié à ta marraine 💎. Clique sur commencer pour démarrer !</p>
+        <p id="instruction">Tu vas devoir résoudre 10 énigmes pour découvrir les lettres d’un mot secret lié à ta marraine 💎. Clique sur commencer pour démarrer !</p>
         <button onclick="startGame()">Commencer</button>
 
         <div id="game" class="hidden">
-            <h2>Énigme <span id="stepNum">1</span>/7</h2>
+            <h2>Énigme <span id="stepNum">1</span>/10</h2>
             <p id="question"></p>
             <input type="text" id="answer" placeholder="Ta réponse ici" autocomplete="off" />
             <br />
@@ -74,46 +74,27 @@
         // Tableau des énigmes avec réponses codées en Base64
         const enigmes = [
             { question: "Quel langage est utilisé pour créer des pages web avec <html> ?", reponseCodee: "aHRtbA==" }, // html
-            { question: "Base64 de 'Elmas' ?", reponseCodee: "UkVtTGFz" }, // Remarque : Base64 de 'Elmas' = RWxtYXM= , ici modifié volontairement pour l'exemple
+            { question: "Base64 de 'Elmas' ?", reponseCodee: "UkVtTGFz" }, // tu peux ajuster si besoin
             { question: "Combien y a-t-il de bits dans un octet ?", reponseCodee: "OA==" }, // 8
             { question: "Complète : HyperText ... Language", reponseCodee: "bWFya3Vw" }, // markup
             { question: "Quel est le langage le plus utilisé pour les scripts dans le navigateur ?", reponseCodee: "amF2YXNjcmlwdA==" }, // javascript
             { question: "Résous : 2 + 2 * 2 = ?", reponseCodee: "Ng==" }, // 6
-            { question: "César : 'Epmfu' avec décalage -1 ?", reponseCodee: "ZG9sZA==" } // doldt
+            { question: "César : 'Epmfu' avec décalage -1 ?", reponseCodee: "ZG9sZA==" }, // doldt
+
+            // Nouvelles énigmes
+            { question: "Quelle couleur obtient-on en mélangeant du rouge et du bleu ?", reponseCodee: "dmVpbGV0" }, // violet
+            { question: "Combien de côtés a un hexagone ?", reponseCodee: "Ng==" }, // 6
+            { question: "Que signifie l’acronyme HTML ?", reponseCodee: "aHlwZXJ0ZXh0IG1hcmt1cCBsYW5ndWFnZQ==" } // hypertext markup language
         ];
 
-        // Lettres dans l'ordre (mot secret)
-        const lettres = ["D", "I", "A", "M", "A", "N", "T"];
+        // Mot secret : 10 lettres (DIAMANTVIOLET)
+        const lettres = ["D", "I", "A", "M", "A", "N", "T", "V", "I", "O", "L", "E", "T"];
+
+        // Ajustement : Il y a 13 lettres, mais on a 10 énigmes, donc on peut prendre uniquement les 10 premières lettres :
+        const lettresAUtiliser = lettres.slice(0, enigmes.length);
+
         let etape = 0;
-        let lettresRestantes = [...lettres]; // Copie des lettres à débloquer
-
-        function checkAnswer() {
-            const userInput = document.getElementById("answer").value.trim().toLowerCase();
-            const reponseDecodee = atob(enigmes[etape].reponseCodee).toLowerCase();
-        
-            if (userInput === reponseDecodee) {
-                document.getElementById("feedback").innerText = "✅ Bonne réponse ! Lettre débloquée.";
-        
-                // Choisir une lettre aléatoire dans les lettres restantes
-                const randomIndex = Math.floor(Math.random() * lettresRestantes.length);
-                const letter = lettresRestantes.splice(randomIndex, 1)[0]; // Retire la lettre et la récupère
-        
-                // Affiche la lettre
-                const letterBox = document.createElement("div");
-                letterBox.className = "letter-box";
-                letterBox.innerText = letter;
-                document.getElementById("unlockedLetters").appendChild(letterBox);
-        
-                etape++;
-                setTimeout(afficherEtape, 1000);
-            } else {
-                document.getElementById("feedback").innerText = "❌ Mauvaise réponse, réessaie.";
-            }
-        }
-
-
-        // Mélange aléatoire des lettres pour le déblocage
-        let lettresMelangees = [...lettres].sort(() => 0.5 - Math.random());
+        let lettresRestantes = [...lettresAUtiliser]; // Copie pour tirage aléatoire
 
         function startGame() {
             document.getElementById("game").classList.remove("hidden");
@@ -130,7 +111,6 @@
                 document.getElementById("answer").value = "";
                 document.getElementById("feedback").innerText = "";
             } else {
-                // Toutes les énigmes résolues : étape finale
                 document.getElementById("game").classList.add("hidden");
                 document.getElementById("finalStep").classList.remove("hidden");
             }
@@ -143,8 +123,9 @@
             if (userInput === reponseDecodee) {
                 document.getElementById("feedback").innerText = "✅ Bonne réponse ! Lettre débloquée.";
 
-                // Affiche la lettre correspondant à cette étape (ordre mélangé)
-                const letter = lettresMelangees[etape];
+                const randomIndex = Math.floor(Math.random() * lettresRestantes.length);
+                const letter = lettresRestantes.splice(randomIndex, 1)[0];
+
                 const letterBox = document.createElement("div");
                 letterBox.className = "letter-box";
                 letterBox.innerText = letter;
@@ -159,7 +140,8 @@
 
         function checkFinalAnswer() {
             const mot = document.getElementById("finalAnswer").value.trim().toUpperCase();
-            if (mot === "DIAMANT") {
+            const motSecret = lettresAUtiliser.join("");
+            if (mot === motSecret) {
                 document.getElementById("finalFeedback").innerText = "🎉 Bravo ! Tu as trouvé le mot secret 💎 ! Va voir ta marraine Elmas !";
             } else {
                 document.getElementById("finalFeedback").innerText = "😅 Ce n’est pas le bon mot, réfléchis encore...";
