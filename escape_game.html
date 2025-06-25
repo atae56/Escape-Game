@@ -1,179 +1,135 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <title>Escape Game Difficile</title>
+  <meta charset="UTF-8" />
+  <title>Escape Game</title>
   <style>
     body {
-      margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background-color: #111;
-      color: #eee;
+      font-family: sans-serif;
+      background: #111;
+      color: white;
+      padding: 20px;
     }
-
-    #accueil, #jeu {
-      display: none;
-      padding: 40px;
+    .active { display: block; }
+    .hidden { display: none; }
+    .question {
+      margin: 20px 0;
     }
-
-    #accueil.active, #jeu.active {
-      display: block;
+    .digit {
+      font-size: 24px;
+      margin-left: 10px;
+      color: #4caf50;
     }
-
-    .center {
-      text-align: center;
-      margin-top: 100px;
+    #code {
+      font-size: 28px;
+      margin: 20px 0;
+      color: #ffeb3b;
     }
-
     button {
-      padding: 15px 30px;
-      font-size: 18px;
-      background-color: #4caf50;
+      padding: 10px 20px;
+      font-size: 16px;
+      background: #2196f3;
       color: white;
       border: none;
       border-radius: 10px;
-      cursor: pointer;
-    }
-
-    .question {
-      background: #222;
-      padding: 15px;
-      margin-bottom: 20px;
-      border-left: 5px solid #4caf50;
-      border-radius: 8px;
-    }
-
-    input[type="text"] {
-      padding: 5px;
-      border-radius: 5px;
-      border: none;
-      width: 200px;
-    }
-
-    .digit {
-      font-size: 24px;
-      font-weight: bold;
-      margin-left: 15px;
-      color: #4caf50;
-    }
-
-    #code {
-      font-size: 30px;
-      letter-spacing: 8px;
-      margin-top: 30px;
-      color: #4caf50;
+      margin-top: 10px;
     }
   </style>
 </head>
 <body>
+  <div id="accueil" class="active">
+    <h1>Escape Game</h1>
+    <button onclick="commencerJeu()">Commencer</button>
+  </div>
 
-<!-- Page d'accueil -->
-<div id="accueil" class="active center">
-  <h1>🧠 Escape Game Difficile</h1>
-  <p>Bienvenue dans ce défi ! Résous 10 énigmes pour découvrir un code secret.</p>
-  <button onclick="commencerJeu()">Commencer</button>
-</div>
+  <div id="jeu" class="hidden">
+    <h2>Résous les énigmes pour découvrir le code</h2>
+    <div id="questions"></div>
+    <div id="code">_ _ _ _ _ _ _ _ _ _</div>
+    <button id="btnSuivant" class="hidden" onclick="afficherLettre()">Suivant</button>
+    <div id="lettreFinale" style="font-size:28px; margin-top:20px; color:#ffeb3b;"></div>
+  </div>
 
-<!-- Page du jeu -->
-<div id="jeu">
-  <h2>Résous les énigmes. Chaque bonne réponse dévoile un chiffre du code secret.</h2>
-  <div id="questions"></div>
-  <h2>📞 Code final :</h2>
-  <div id="code">_ _ _ _ _ _ _ _ _ _</div>
-</div>
+  <script>
+    const enigmes = [
+      { question: "1. Mon premier est un mois sans E, mon second est une note sans son, et mon tout est une illusion.", hash: "b20459ab886e03b9a00f952b4e2adc167f9af9b53b0909860e9c58c2f1cecd60", digit: "0" },
+      { question: "2. Je suis le fruit d’un menteur qui dit toujours la vérité. Que suis-je ?", hash: "dce7b7433cf6ae93530d3448843b427bf27289e32921e67e563a13c1778f5189", digit: "6" },
+      { question: "3. Plus je suis grand, moins on me voit. Que suis-je ?", hash: "c89fb7b28e571114770a47c99b441375b94ff84b5e6448353e555d1de7e52121", digit: "5" },
+      { question: "4. Je commence la nuit, je finis le matin et je ne dure qu’un instant.", hash: "17ba218488d6c1486b027d96141e48d74dfb8d75cb61cde361b4d6028a45161e", digit: "2" },
+      { question: "5. Je suis ce que tu prends sans jamais le voler, mais qui peut te rendre sourd.", hash: "55c64d0fcd6f9d5f7c828093857e3fdfda68478bb4e9bd24d481ef391c7804e8", digit: "2" },
+      { question: "6. Si tu m’as, tu veux me partager. Si tu me partages, tu ne m’as plus. Que suis-je ?", hash: "2bb80d537b1da3e38bd30361aa855686bde0eacd7162fef6a25fe97bf527a25b", digit: "6" },
+      { question: "7. Je ne peux être vu qu’en me fermant les yeux. Que suis-je ?", hash: "ec3d00212250fb995d08c5a0692febc3fedb243281eb3defe45fa3fbf992c23f", digit: "5" },
+      { question: "8. Mon père est le tonnerre, ma mère est la lumière, je suis rapide comme l’éclair.", hash: "b23c17615a958ba416908acc36daf35ddc9b424274075e426256bd7cebb0c650", digit: "7" },
+      { question: "9. Je suis une erreur qu’on ne voit qu’une fois qu’elle est faite.", hash: "cf767de2b24a6f3b5b535ecc6a81bdf126f4f64c5e6c9c6c9450e7df5be74d4f", digit: "0" },
+      { question: "10. Je ne vis que quand tu me lis, je meurs quand tu m’oublies.", hash: "d15eec53207e92fd31b2b10523b296153ce6fe362ae1db26b664e9d934789631", digit: "6" }
+    ];
 
-<script>
-  const enigmes = [
-    { question: "1. Mon premier est un mois sans E, mon second est une note sans son, et mon tout est une illusion.", answer: "mirage", digit: "0" },
-    { question: "2. Je suis le fruit d’un menteur qui dit toujours la vérité. Que suis-je ?", answer: "paradoxe", digit: "6" },
-    { question: "3. Plus je suis grand, moins on me voit. Que suis-je ?", answer: "obscurité", digit: "5" },
-    { question: "4. Je commence la nuit, je finis le matin et je ne dure qu’un instant.", answer: "rêve", digit: "2" },
-    { question: "5. Je suis ce que tu prends sans jamais le voler, mais qui peut te rendre sourd.", answer: "photo", digit: "2" },
-    { question: "6. Si tu m’as, tu veux me partager. Si tu me partages, tu ne m’as plus. Que suis-je ?", answer: "secret", digit: "6" },
-    { question: "7. Je ne peux être vu qu’en me fermant les yeux. Que suis-je ?", answer: "imagination", digit: "5" },
-    { question: "8. Mon père est le tonnerre, ma mère est la lumière, je suis rapide comme l’éclair.", answer: "foudre", digit: "7" },
-    { question: "9. Je suis une erreur qu’on ne voit qu’une fois qu’elle est faite.", answer: "faute", digit: "0" },
-    { question: "10. Je ne vis que quand tu me lis, je meurs quand tu m’oublies.", answer: "histoire", digit: "6" }
-  ];
+    const codeDigits = Array(10).fill("_");
+    const codeDisplay = document.getElementById("code");
+    const questionsDiv = document.getElementById("questions");
+    const btnSuivant = document.getElementById("btnSuivant");
+    const lettreDiv = document.getElementById("lettreFinale");
 
-  const codeDigits = Array(10).fill("_");
-  const codeDisplay = document.getElementById("code");
-  const questionsDiv = document.getElementById("questions");
-
-  // Ajout du bouton Suivant et de la lettre finale
-  const btnSuivant = document.createElement("button");
-  btnSuivant.innerText = "Suivant";
-  btnSuivant.style.display = "none";
-  btnSuivant.onclick = afficherLettre;
-  btnSuivant.style.marginTop = "20px";
-  btnSuivant.style.fontSize = "18px";
-  btnSuivant.style.padding = "10px 20px";
-  btnSuivant.style.backgroundColor = "#2196f3";
-  btnSuivant.style.color = "white";
-  btnSuivant.style.border = "none";
-  btnSuivant.style.borderRadius = "10px";
-  questionsDiv.parentElement.appendChild(btnSuivant);
-
-  const lettreDiv = document.createElement("div");
-  lettreDiv.id = "lettreFinale";
-  lettreDiv.style.fontSize = "28px";
-  lettreDiv.style.marginTop = "20px";
-  lettreDiv.style.color = "#ffeb3b";
-  lettreDiv.style.fontWeight = "bold";
-  questionsDiv.parentElement.appendChild(lettreDiv);
-
-  function updateCode() {
-    codeDisplay.innerText = codeDigits.join(" ");
-    if (!codeDigits.includes("_")) {
-      btnSuivant.style.display = "inline-block";
-    }
-  }
-
-  function commencerJeu() {
-    document.getElementById("accueil").classList.remove("active");
-    document.getElementById("jeu").classList.add("active");
-    lancerEnigmes();
-  }
-
-  function lancerEnigmes() {
-    enigmes.forEach((enigme, index) => {
-      const div = document.createElement("div");
-      div.className = "question";
-      div.innerHTML = `
-        <p>${enigme.question}</p>
-        <input type="text" id="input-${index}" />
-        <button onclick="check(${index})">Valider</button>
-        <span class="digit" id="digit-${index}">_</span>
-      `;
-      questionsDiv.appendChild(div);
-    });
-    updateCode();
-  }
-
-  function normalize(str) {
-    return str.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-  }
-
-  function check(index) {
-    const input = document.getElementById(`input-${index}`).value;
-    const guess = normalize(input);
-    const answer = normalize(enigmes[index].answer);
-    const display = document.getElementById(`digit-${index}`);
-
-    if (guess === answer) {
-      display.innerText = enigmes[index].digit;
-      codeDigits[index] = enigmes[index].digit;
-    } else {
-      display.innerText = "❌";
+    function updateCode() {
+      codeDisplay.innerText = codeDigits.join(" ");
+      if (!codeDigits.includes("_")) {
+        btnSuivant.classList.remove("hidden");
+      }
     }
 
-    updateCode();
-  }
+    function commencerJeu() {
+      document.getElementById("accueil").classList.add("hidden");
+      document.getElementById("jeu").classList.remove("hidden");
+      lancerEnigmes();
+    }
 
-  function afficherLettre() {
-    lettreDiv.innerText = "Lettre : A";
-    btnSuivant.style.display = "none"; // Optionnel : cacher le bouton après clic
-  }
-</script>
+    function lancerEnigmes() {
+      enigmes.forEach((enigme, index) => {
+        const div = document.createElement("div");
+        div.className = "question";
+        div.innerHTML = `
+          <p>${enigme.question}</p>
+          <input type="text" id="input-${index}" />
+          <button onclick="check(${index})">Valider</button>
+          <span class="digit" id="digit-${index}">_</span>
+        `;
+        questionsDiv.appendChild(div);
+      });
+      updateCode();
+    }
+
+    async function hashTexte(texte) {
+      const encoder = new TextEncoder();
+      const data = encoder.encode(normalize(texte));
+      const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    function normalize(str) {
+      return str.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    }
+
+    async function check(index) {
+      const input = document.getElementById(`input-${index}`).value;
+      const guessHash = await hashTexte(input);
+      const correctHash = enigmes[index].hash;
+      const display = document.getElementById(`digit-${index}`);
+
+      if (guessHash === correctHash) {
+        display.innerText = enigmes[index].digit;
+        codeDigits[index] = enigmes[index].digit;
+      } else {
+        display.innerText = "❌";
+      }
+
+      updateCode();
+    }
+
+    function afficherLettre() {
+      lettreDiv.innerText = "Un beau travail, tu as réussi à trouver mon numéro. Cependant, même si vous avez mon numéro, vous ne me connaissez toujours pas, encore un problème. Pour réussir, vous devez trouver mon nom. Allez-y et envoyez un message au numéro de téléphone pour recevoir l’indice suivant utile.";
+      btnSuivant.classList.add("hidden");
+    }
+  </script>
 </body>
 </html>
