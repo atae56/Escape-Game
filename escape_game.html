@@ -101,8 +101,33 @@
   const codeDisplay = document.getElementById("code");
   const questionsDiv = document.getElementById("questions");
 
+  // Ajout du bouton Suivant et de la lettre finale
+  const btnSuivant = document.createElement("button");
+  btnSuivant.innerText = "Suivant";
+  btnSuivant.style.display = "none";
+  btnSuivant.onclick = afficherLettre;
+  btnSuivant.style.marginTop = "20px";
+  btnSuivant.style.fontSize = "18px";
+  btnSuivant.style.padding = "10px 20px";
+  btnSuivant.style.backgroundColor = "#2196f3";
+  btnSuivant.style.color = "white";
+  btnSuivant.style.border = "none";
+  btnSuivant.style.borderRadius = "10px";
+  questionsDiv.parentElement.appendChild(btnSuivant);
+
+  const lettreDiv = document.createElement("div");
+  lettreDiv.id = "lettreFinale";
+  lettreDiv.style.fontSize = "28px";
+  lettreDiv.style.marginTop = "20px";
+  lettreDiv.style.color = "#ffeb3b";
+  lettreDiv.style.fontWeight = "bold";
+  questionsDiv.parentElement.appendChild(lettreDiv);
+
   function updateCode() {
     codeDisplay.innerText = codeDigits.join(" ");
+    if (!codeDigits.includes("_")) {
+      btnSuivant.style.display = "inline-block";
+    }
   }
 
   function commencerJeu() {
@@ -145,7 +170,11 @@
 
     updateCode();
   }
-</script>
 
+  function afficherLettre() {
+    lettreDiv.innerText = "Lettre : A";
+    btnSuivant.style.display = "none"; // Optionnel : cacher le bouton après clic
+  }
+</script>
 </body>
 </html>
