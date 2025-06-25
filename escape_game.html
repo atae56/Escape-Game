@@ -74,28 +74,23 @@
         // Tableau des énigmes avec réponses codées en Base64
         const enigmes = [
             { question: "Quel langage est utilisé pour créer des pages web avec <html> ?", reponseCodee: "aHRtbA==" }, // html
-            { question: "Base64 de 'Elmas' ?", reponseCodee: "RWxtYXM=" }, // tu peux ajuster si besoin
+            { question: "Base64 de 'Elmas' ?", reponseCodee: "RWxtYXM=" }, // Elmas encodé
             { question: "Combien y a-t-il de bits dans un octet ?", reponseCodee: "OA==" }, // 8
             { question: "Complète : HyperText ... Language", reponseCodee: "bWFya3Vw" }, // markup
             { question: "Quel est le langage le plus utilisé pour les scripts dans le navigateur ?", reponseCodee: "amF2YXNjcmlwdA==" }, // javascript
             { question: "Résous : 2 + 2 * 2 = ?", reponseCodee: "Ng==" }, // 6
-            { question: "César : 'Epmfu' avec décalage -1 ?", reponseCodee: "ZG9sZA==" }, // doldt
-
-            // Nouvelles énigmes
+            { question: "César : 'Epmfu' avec décalage -1 ?", reponseCodee: "ZG9sZA==" }, // dold
             { question: "Quelle couleur obtient-on en mélangeant du rouge et du bleu ?", reponseCodee: "dmVpbGV0" }, // violet
             { question: "Combien de côtés a un hexagone ?", reponseCodee: "Ng==" }, // 6
             { question: "Que signifie l’acronyme HTML ?", reponseCodee: "aHlwZXJ0ZXh0IG1hcmt1cCBsYW5ndWFnZQ==" } // hypertext markup language
         ];
-
-        // Mot secret : 10 lettres (DIAMANTVIOLET)
+    
         const lettres = ["D", "I", "A", "M", "A", "N", "T", "V", "I", "O", "L", "E", "T"];
-
-        // Ajustement : Il y a 13 lettres, mais on a 10 énigmes, donc on peut prendre uniquement les 10 premières lettres :
         const lettresAUtiliser = lettres.slice(0, enigmes.length);
-
+    
         let etape = 0;
-        let lettresRestantes = [...lettresAUtiliser]; // Copie pour tirage aléatoire
-
+        let lettresRestantes = [...lettresAUtiliser];
+    
         function startGame() {
             document.getElementById("game").classList.remove("hidden");
             document.getElementById("letters").classList.remove("hidden");
@@ -103,7 +98,7 @@
             document.getElementById("instruction").style.display = "none";
             afficherEtape();
         }
-
+    
         function afficherEtape() {
             if (etape < enigmes.length) {
                 document.getElementById("stepNum").innerText = etape + 1;
@@ -115,29 +110,29 @@
                 document.getElementById("finalStep").classList.remove("hidden");
             }
         }
-
+    
         function checkAnswer() {
-            const userInput = document.getElementById("answer").value.trim().toLowerCase();
-            const reponseDecodee = atob(enigmes[etape].reponseCodee).toLowerCase();
-
-            if (userInput === reponseDecodee) {
+            const userInput = document.getElementById("answer").value.trim();
+            const reponseCodee = enigmes[etape].reponseCodee;
+    
+            if (userInput === reponseCodee) {
                 document.getElementById("feedback").innerText = "✅ Bonne réponse ! Lettre débloquée.";
-
+    
                 const randomIndex = Math.floor(Math.random() * lettresRestantes.length);
                 const letter = lettresRestantes.splice(randomIndex, 1)[0];
-
+    
                 const letterBox = document.createElement("div");
                 letterBox.className = "letter-box";
                 letterBox.innerText = letter;
                 document.getElementById("unlockedLetters").appendChild(letterBox);
-
+    
                 etape++;
                 setTimeout(afficherEtape, 1000);
             } else {
                 document.getElementById("feedback").innerText = "❌ Mauvaise réponse, réessaie.";
             }
         }
-
+    
         function checkFinalAnswer() {
             const mot = document.getElementById("finalAnswer").value.trim().toUpperCase();
             const motSecret = lettresAUtiliser.join("");
