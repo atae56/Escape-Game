@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Escape Game - Trouve le mot secret 💎</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #1a1a1a;
+            color: white;
+            text-align: center;
+            padding: 30px;
+        }
+        .container {
+            max-width: 700px;
+            margin: auto;
+            padding: 20px;
+            background-color: #2b2b2b;
+            border-radius: 10px;
+            box-shadow: 0 0 10px #00ffff;
+        }
+        input, button {
+            padding: 10px;
+            font-size: 16px;
+            margin-top: 10px;
+            border-radius: 5px;
+            border: none;
+        }
+        .hidden {
+            display: none;
+        }
+        .letter-box {
+            display: inline-block;
+            margin: 5px;
+            padding: 10px 15px;
+            background: #00ffff;
+            color: black;
+            font-weight: bold;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔐 Escape Game : Trouve le mot secret</h1>
+        <p id="instruction">Tu vas devoir résoudre 7 énigmes pour découvrir les lettres d’un mot secret lié à ta marraine 💎. Clique sur commencer pour démarrer !</p>
+        <button onclick="startGame()">Commencer</button>
+
+        <div id="game" class="hidden">
+            <h2>Énigme <span id="stepNum">1</span>/7</h2>
+            <p id="question"></p>
+            <input type="text" id="answer" placeholder="Ta réponse ici" />
+            <br>
+            <button onclick="checkAnswer()">Valider</button>
+            <p id="feedback"></p>
+        </div>
+
+        <div id="letters" class="hidden">
+            <h3>Lettres débloquées :</h3>
+            <div id="unlockedLetters"></div>
+        </div>
+
+        <div id="finalStep" class="hidden">
+            <h2>Dernière étape</h2>
+            <p>Tu as débloqué toutes les lettres ! Trouve le mot secret :</p>
+            <input type="text" id="finalAnswer" placeholder="Mot secret..." />
+            <br>
+            <button onclick="checkFinalAnswer()">Valider le mot</button>
+            <p id="finalFeedback"></p>
+        </div>
+    </div>
+
+    <script>
+        const enigmes = [
+            { question: "Quel langage est utilisé pour créer des pages web avec <html> ?", reponse: "html" },
+            { question: "Base64 de 'Elmas' ?", reponse: "RWxtYXM=" },
+            { question: "Combien y a-t-il de bits dans un octet ?", reponse: "8" },
+            { question: "Complète : HyperText ... Language", reponse: "markup" },
+            { question: "Quel est le langage le plus utilisé pour les scripts dans le navigateur ?", reponse: "javascript" },
+            { question: "Résous : 2 + 2 * 2 = ?", reponse: "6" },
+            { question: "César : 'Epmfu' avec décalage -1 ?", reponse: "doldt" }
+        ];
+
+        const lettres = ["D", "I", "A", "M", "A", "N", "T"];
+        let etape = 0;
+        let lettresMelangees = [...lettres].sort(() => 0.5 - Math.random());
+
+        function startGame() {
+            document.getElementById("game").classList.remove("hidden");
+            document.getElementById("letters").classList.remove("hidden");
+            document.querySelector("button").style.display = "none";
+            document.getElementById("instruction").style.display = "none";
+            afficherEtape();
+        }
+
+        function afficherEtape() {
+            if (etape < enigmes.length) {
+                document.getElementById("stepNum").innerText = etape + 1;
+                document.getElementById("question").innerText = enigmes[etape].question;
+                document.getElementById("answer").value = "";
+                document.getElementById("feedback").innerText = "";
+            } else {
+                document.getElementById("game").classList.add("hidden");
+                document.getElementById("finalStep").classList.remove("hidden");
+            }
+        }
+
+        function checkAnswer() {
+            let userInput = document.getElementById("answer").value.trim().toLowerCase();
+            if (userInput === enigmes[etape].reponse.toLowerCase()) {
+                document.getElementById("feedback").innerText = "✅ Bonne réponse ! Lettre débloquée.";
+                let letter = lettresMelangees[etape];
+                let letterBox = document.createElement("div");
+                letterBox.className = "letter-box";
+                letterBox.innerText = letter;
+                document.getElementById("unlockedLetters").appendChild(letterBox);
+                etape++;
+                setTimeout(afficherEtape, 1000);
+            } else {
+                document.getElementById("feedback").innerText = "❌ Mauvaise réponse, réessaie.";
+            }
+        }
+
+        function checkFinalAnswer() {
+            let mot = document.getElementById("finalAnswer").value.trim().toUpperCase();
+            if (mot === "DIAMANT") {
+                document.getElementById("finalFeedback").innerText = "🎉 Bravo ! Tu as trouvé le mot secret 💎 ! Va voir ta marraine Elmas !";
+            } else {
+                document.getElementById("finalFeedback").innerText = "😅 Ce n’est pas le bon mot, réfléchis encore...";
+            }
+        }
+    </script>
+</body>
+</html>
