@@ -4,13 +4,21 @@
   <meta charset="UTF-8" />
   <title>Escape Game</title>
   <style>
-    body {
-      font-family: sans-serif;
+    html, body {
+      margin: 0;
+      height: 100%;
       background: #111;
       color: white;
-      padding: 20px;
+      font-family: sans-serif;
     }
-    .active { display: block; }
+    #accueil {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100%;
+      text-align: center;
+    }
     .hidden { display: none; }
     .question {
       margin: 20px 0;
@@ -33,6 +41,7 @@
       border: none;
       border-radius: 10px;
       margin-top: 10px;
+      cursor: pointer;
     }
   </style>
 </head>
@@ -42,12 +51,11 @@
     <button onclick="commencerJeu()">Commencer</button>
   </div>
 
-  <div id="jeu" class="hidden">
+  <div id="jeu" class="hidden" style="padding: 20px;">
     <h2>Résous les énigmes pour découvrir le code</h2>
     <div id="questions"></div>
     <div id="code">_ _ _ _ _ _ _ _ _ _</div>
-    <button id="btnSuivant" class="hidden" onclick="afficherLettre()">Suivant</button>
-    <div id="lettreFinale" style="font-size:28px; margin-top:20px; color:#ffeb3b;"></div>
+    <button id="btnSuivant" class="hidden" onclick="suivant()">Suivant</button>
   </div>
 
   <script>
@@ -65,17 +73,12 @@
     ];
 
     const codeDigits = Array(10).fill("_");
-    const codeDisplay = document.getElementById("code");
-    const questionsDiv = document.getElementById("questions");
-    const btnSuivant = document.getElementById("btnSuivant");
-    const lettreDiv = document.getElementById("lettreFinale");
-
-    function updateCode() {
-      codeDisplay.innerText = codeDigits.join(" ");
+    const codeDisplay = () => {
+      document.getElementById("code").innerText = codeDigits.join(" ");
       if (!codeDigits.includes("_")) {
-        btnSuivant.classList.remove("hidden");
+        document.getElementById("btnSuivant").classList.remove("hidden");
       }
-    }
+    };
 
     function commencerJeu() {
       document.getElementById("accueil").classList.add("hidden");
@@ -84,51 +87,47 @@
     }
 
     function lancerEnigmes() {
-      enigmes.forEach((enigme, index) => {
+      enigmes.forEach((e, i) => {
         const div = document.createElement("div");
         div.className = "question";
         div.innerHTML = `
-          <p>${enigme.question}</p>
-          <input type="text" id="input-${index}" />
-          <button onclick="check(${index})">Valider</button>
-          <span class="digit" id="digit-${index}">_</span>
+          <p>${e.question}</p>
+          <input type="text" id="input-${i}" />
+          <button onclick="check(${i})">Valider</button>
+          <span class="digit" id="digit-${i}">_</span>
         `;
-        questionsDiv.appendChild(div);
+        document.getElementById("questions").appendChild(div);
       });
-      updateCode();
+      codeDisplay();
     }
 
     async function hashTexte(texte) {
       const encoder = new TextEncoder();
       const data = encoder.encode(normalize(texte));
       const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-      const hashArray = Array.from(new Uint8Array(hashBuffer));
-      return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+      return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
     }
 
     function normalize(str) {
       return str.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
     }
 
-    async function check(index) {
-      const input = document.getElementById(`input-${index}`).value;
-      const guessHash = await hashTexte(input);
-      const correctHash = enigmes[index].hash;
-      const display = document.getElementById(`digit-${index}`);
-
-      if (guessHash === correctHash) {
-        display.innerText = enigmes[index].digit;
-        codeDigits[index] = enigmes[index].digit;
+    async function check(i) {
+      const input = document.getElementById(`input-${i}`).value;
+      const guess = await hashTexte(input);
+      const correct = enigmes[i].hash;
+      const span = document.getElementById(`digit-${i}`);
+      if (guess === correct) {
+        span.innerText = enigmes[i].digit;
+        codeDigits[i] = enigmes[i].digit;
       } else {
-        display.innerText = "❌";
+        span.innerText = "❌";
       }
-
-      updateCode();
+      codeDisplay();
     }
 
-    function afficherLettre() {
-      lettreDiv.innerText = "Un beau travail, tu as réussi à trouver mon numéro. Cependant, même si vous avez mon numéro, vous ne me connaissez toujours pas, encore un problème. Pour réussir, vous devez trouver mon nom. Allez-y et envoyez un message au numéro de téléphone pour recevoir l’indice suivant utile.";
-      btnSuivant.classList.add("hidden");
+    function suivant() {
+      window.location.href = "lettre.html";
     }
   </script>
 </body>
