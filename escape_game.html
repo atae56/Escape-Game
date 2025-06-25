@@ -114,6 +114,7 @@
         function checkAnswer() {
             const userInput = document.getElementById("answer").value.trim();
             const reponseCodee = enigmes[etape].reponseCodee;
+
     
             if (userInput === reponseCodee) {
                 document.getElementById("feedback").innerText = "✅ Bonne réponse ! Lettre débloquée.";
