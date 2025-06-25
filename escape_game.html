@@ -2,95 +2,87 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Escape Game Sécurisé</title>
+  <title>Escape Game Difficile</title>
   <style>
     body {
-      background-color: #121212;
+      background-color: #111;
       color: #eee;
-      font-family: sans-serif;
-      padding: 20px;
+      font-family: 'Segoe UI', sans-serif;
+      padding: 30px;
     }
     .question {
-      margin-bottom: 20px;
+      background: #222;
       padding: 15px;
-      background-color: #1f1f1f;
+      margin-bottom: 20px;
       border-left: 5px solid #4caf50;
       border-radius: 8px;
     }
     input[type="text"] {
       padding: 5px;
-      width: 150px;
+      border-radius: 5px;
       border: none;
-      border-radius: 4px;
+      width: 200px;
     }
     button {
-      margin-left: 10px;
-      background-color: #4caf50;
-      border: none;
       padding: 5px 10px;
+      background: #4caf50;
+      border: none;
       color: white;
-      border-radius: 4px;
+      border-radius: 5px;
+      margin-left: 10px;
       cursor: pointer;
     }
     .digit {
+      font-size: 24px;
       font-weight: bold;
-      font-size: 20px;
-      margin-left: 10px;
+      margin-left: 15px;
+      color: #4caf50;
     }
     #code {
-      font-size: 28px;
-      letter-spacing: 5px;
-      margin-top: 20px;
+      font-size: 30px;
+      letter-spacing: 8px;
+      margin-top: 30px;
       color: #4caf50;
     }
   </style>
 </head>
 <body>
 
-<h1>🔐 Escape Game : Trouve le Code Secret</h1>
-<p>Résous les énigmes. Chaque bonne réponse révèle un chiffre du code secret.</p>
+<h1>🧠 Escape Game Difficile</h1>
+<p>Résous les 10 énigmes. Chaque bonne réponse dévoile un chiffre du code secret.</p>
 
 <div id="questions"></div>
 
-<h2>Code :</h2>
+<h2>📞 Code final :</h2>
 <div id="code">_ _ _ _ _ _ _ _ _ _</div>
 
 <script>
   const enigmes = [
-    { question: "Combien de lettres contient le mot 'zéro' ?", hash: "2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824", digit: "0" }, // "0"
-    { question: "Un chiffre pair entre 5 et 7 ?", hash: "d4735e3a265e16eee03f59718b9b5d03b0da4b81dce4a1b92b6f1f2a78e0ec6f", digit: "6" }, // "6"
-    { question: "Combien font 2 + 3 ?", hash: "5d41402abc4b2a76b9719d911017c592", digit: "5" }, // "5"
-    { question: "Le chiffre entre 1 et 3 ?", hash: "6d7fce9fee471194aa8b5b6e47267f03", digit: "2" }, // "2"
-    { question: "La moitié de 10 ?", hash: "e4da3b7fbbce2345d7772b0674a318d5", digit: "2" }, // "5"
-    { question: "7 arrondi à l’inférieur ?", hash: "1679091c5a880faf6fb5e6087eb1b2dc", digit: "6" }, // "6"
-    { question: "Double de 2.5 ?", hash: "e4da3b7fbbce2345d7772b0674a318d5", digit: "5" }, // "5"
-    { question: "Chiffre après 6 ?", hash: "8f14e45fceea167a5a36dedd4bea2543", digit: "7" }, // "7"
-    { question: "Premier chiffre à deux chiffres ?", hash: "cfcd208495d565ef66e7dff9f98764da", digit: "0" }, // "10" (trick: they might enter "1")
-    { question: "Le chiffre qui vaut rien ?", hash: "2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824", digit: "6" } // "0"
+    { question: "1. Mon premier est un mois sans E, mon second est une note sans son, et mon tout est une illusion.", answer: "mirage", digit: "0" },
+    { question: "2. Je suis le fruit d’un menteur qui dit toujours la vérité. Que suis-je ?", answer: "paradoxe", digit: "6" },
+    { question: "3. Plus je suis grand, moins on me voit. Que suis-je ?", answer: "obscurité", digit: "5" },
+    { question: "4. Je commence la nuit, je finis le matin et je ne dure qu’un instant.", answer: "rêve", digit: "2" },
+    { question: "5. Je suis ce que tu prends sans jamais le voler, mais qui peut te rendre sourd.", answer: "photo", digit: "2" },
+    { question: "6. Si tu m’as, tu veux me partager. Si tu me partages, tu ne m’as plus. Que suis-je ?", answer: "secret", digit: "6" },
+    { question: "7. Je ne peux être vu qu’en me fermant les yeux. Que suis-je ?", answer: "imagination", digit: "5" },
+    { question: "8. Mon père est le tonnerre, ma mère est la lumière, je suis rapide comme l’éclair.", answer: "foudre", digit: "7" },
+    { question: "9. Je suis une erreur qu’on ne voit qu’une fois qu’elle est faite.", answer: "faute", digit: "0" },
+    { question: "10. Je ne vis que quand tu me lis, je meurs quand tu m’oublies.", answer: "histoire", digit: "6" }
   ];
 
   const codeDigits = Array(10).fill("_");
-  const codeDiv = document.getElementById('code');
-  const questionsDiv = document.getElementById('questions');
+  const codeDisplay = document.getElementById("code");
+  const questionsDiv = document.getElementById("questions");
 
-  // Util function to hash input (SHA-256)
-  async function sha256(text) {
-    const encoder = new TextEncoder();
-    const data = encoder.encode(text.trim().toLowerCase());
-    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-    return [...new Uint8Array(hashBuffer)].map(b => b.toString(16).padStart(2, '0')).join('');
+  function updateCode() {
+    codeDisplay.innerText = codeDigits.join(" ");
   }
 
-  function updateCodeDisplay() {
-    codeDiv.innerText = codeDigits.join(" ");
-  }
-
-  // Create all questions
   enigmes.forEach((enigme, index) => {
     const div = document.createElement("div");
     div.className = "question";
     div.innerHTML = `
-      <p><strong>Énigme ${index + 1}</strong>: ${enigme.question}</p>
+      <p>${enigme.question}</p>
       <input type="text" id="input-${index}" />
       <button onclick="check(${index})">Valider</button>
       <span class="digit" id="digit-${index}">_</span>
@@ -98,24 +90,27 @@
     questionsDiv.appendChild(div);
   });
 
-  // Check function
-  async function check(index) {
-    const input = document.getElementById(`input-${index}`);
-    const display = document.getElementById(`digit-${index}`);
-    const hash = await sha256(input.value);
-    const enigme = enigmes[index];
+  function normalize(str) {
+    return str.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, ""); // Enlève accents
+  }
 
-    if (hash === enigme.hash) {
-      display.innerText = enigme.digit;
-      codeDigits[index] = enigme.digit;
+  function check(index) {
+    const input = document.getElementById(`input-${index}`).value;
+    const guess = normalize(input);
+    const answer = normalize(enigmes[index].answer);
+    const display = document.getElementById(`digit-${index}`);
+
+    if (guess === answer) {
+      display.innerText = enigmes[index].digit;
+      codeDigits[index] = enigmes[index].digit;
     } else {
       display.innerText = "❌";
     }
 
-    updateCodeDisplay();
+    updateCode();
   }
 
-  updateCodeDisplay();
+  updateCode();
 </script>
 
 </body>
