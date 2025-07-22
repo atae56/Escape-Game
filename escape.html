@@ -50,16 +50,16 @@
 
   <script>
     const enigmes = [
-      { question: "1. Mon premier est un mois sans E, mon second est une note sans son, et mon tout est une illusion.", hash: "b20459ab886e03b9a00f952b4e2adc167f9af9b53b0909860e9c58c2f1cecd60", digit: "0" },
-      { question: "2. Je suis le fruit d’un menteur qui dit toujours la vérité. Que suis-je ?", hash: "dce7b7433cf6ae93530d3448843b427bf27289e32921e67e563a13c1778f5189", digit: "6" },
-      { question: "3. Plus je suis grand, moins on me voit. Que suis-je ?", hash: "c89fb7b28e571114770a47c99b441375b94ff84b5e6448353e555d1de7e52121", digit: "5" },
-      { question: "4. Je commence la nuit, je finis le matin et je ne dure qu’un instant.", hash: "17ba218488d6c1486b027d96141e48d74dfb8d75cb61cde361b4d6028a45161e", digit: "2" },
-      { question: "5. Je suis ce que tu prends sans jamais le voler, mais qui peut te rendre sourd.", hash: "55c64d0fcd6f9d5f7c828093857e3fdfda68478bb4e9bd24d481ef391c7804e8", digit: "2" },
-      { question: "6. Si tu m’as, tu veux me partager. Si tu me partages, tu ne m’as plus. Que suis-je ?", hash: "2bb80d537b1da3e38bd30361aa855686bde0eacd7162fef6a25fe97bf527a25b", digit: "6" },
-      { question: "7. Je ne peux être vu qu’en me fermant les yeux. Que suis-je ?", hash: "ec3d00212250fb995d08c5a0692febc3fedb243281eb3defe45fa3fbf992c23f", digit: "5" },
-      { question: "8. Mon père est le tonnerre, ma mère est la lumière, je suis rapide comme l’éclair.", hash: "b23c17615a958ba416908acc36daf35ddc9b424274075e426256bd7cebb0c650", digit: "7" },
-      { question: "9. Je suis une erreur qu’on ne voit qu’une fois qu’elle est faite.", hash: "cf767de2b24a6f3b5b535ecc6a81bdf126f4f64c5e6c9c6c9450e7df5be74d4f", digit: "0" },
-      { question: "10. Je ne vis que quand tu me lis, je meurs quand tu m’oublies.", hash: "d15eec53207e92fd31b2b10523b296153ce6fe362ae1db26b664e9d934789631", digit: "6" }
+      "1. Mon premier est un mois sans E, mon second est une note sans son, et mon tout est une illusion.",
+      "2. Je suis le fruit d’un menteur qui dit toujours la vérité. Que suis-je ?",
+      "3. Plus je suis grand, moins on me voit. Que suis-je ?",
+      "4. Je commence la nuit, je finis le matin et je ne dure qu’un instant.",
+      "5. Je suis ce que tu prends sans jamais le voler, mais qui peut te rendre sourd.",
+      "6. Si tu m’as, tu veux me partager. Si tu me partages, tu ne m’as plus. Que suis-je ?",
+      "7. Je ne peux être vu qu’en me fermant les yeux. Que suis-je ?",
+      "8. Mon père est le tonnerre, ma mère est la lumière, je suis rapide comme l’éclair.",
+      "9. Je suis une erreur qu’on ne voit qu’une fois qu’elle est faite.",
+      "10. Je ne vis que quand tu me lis, je meurs quand tu m’oublies."
     ];
 
     const codeDigits = Array(10).fill("_");
@@ -73,11 +73,11 @@
 
     function afficherEnigmes() {
       const container = document.getElementById("questions");
-      enigmes.forEach((e, i) => {
+      enigmes.forEach((q, i) => {
         const div = document.createElement("div");
         div.className = "question";
         div.innerHTML = `
-          <p>${e.question}</p>
+          <p>${q}</p>
           <input type="text" id="input-${i}" />
           <button onclick="valider(${i})">Valider</button>
           <span class="digit" id="digit-${i}">_</span>
@@ -86,11 +86,24 @@
       });
     }
 
-    async function hashTexte(texte) {
-      const encoder = new TextEncoder();
-      const data = encoder.encode(normalize(texte));
-      const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-      return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+    function getHashBase64(index) {
+      const base64Hashes = [
+        "sgQlWrq4huA7mgD5UrTiLcFn+bU1sJmGjpzYwvHOzWA=", // hash 1
+        "3Oe3Qzz2rpNTDTRIhDtCe/JyieMpIeaFdjoTwXePUYk=", // hash 2
+        "yJ+3so5XERG3CkfMmUQTdblP+EtWZEg1PlVdHerlISA=", // hash 3
+        "F7ohhIh2wUhrAn2WFB5Id035j3XLYc3jYbTWCipFFh4=", // hash 4
+        "VcbNDP1vnV94goCThX4//9poR4u0ub0k1IHvORx4BOg=", // hash 5
+        "K7gNU3sdq+OL0wNhqoVWhr3g6s1xYv72ol/pe/UnotU=", // hash 6
+        "7D0AIyUPu5XQjFoGnC/rw/7bJDKB69PuRfovv5ksIj8=", // hash 7
+        "sjwXYVlVixFpKIrcNtrzXd2JQkJ4J0dyZaxKoxZkdtI=", // hash 8
+        "z3Z94rJG8/VbU17MoYH9Em9PZkxfeJxslFDn31vnT08=", // hash 9
+        "0V7sUyB+kv0xsrEFM7KWFTzuvjYq4dsmtmTp2TR4ljE="  // hash 10
+      ];
+      return base64Hashes[index];
+    }
+
+    function getDigit(index) {
+      return "0652265076"[index];
     }
 
     function normalize(str) {
@@ -99,11 +112,15 @@
 
     async function valider(i) {
       const input = document.getElementById(`input-${i}`).value;
-      const guess = await hashTexte(input);
-      const attendu = enigmes[i].hash;
-      if (guess === attendu) {
-        codeDigits[i] = enigmes[i].digit;
-        document.getElementById(`digit-${i}`).innerText = enigmes[i].digit;
+      const encoder = new TextEncoder();
+      const data = encoder.encode(normalize(input));
+      const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+      const hashBase64 = btoa(String.fromCharCode(...new Uint8Array(hashBuffer)));
+
+      if (hashBase64 === getHashBase64(i)) {
+        const digit = getDigit(i);
+        codeDigits[i] = digit;
+        document.getElementById(`digit-${i}`).innerText = digit;
       } else {
         document.getElementById(`digit-${i}`).innerText = "❌";
       }
